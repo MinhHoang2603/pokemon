@@ -1,12 +1,12 @@
-Hitokage,tackle,30,0
-Hitokage,scratch,34,10
-Hitokage,flamethrower,40,50
-Keromatsu,tackle,30,0
-Keromatsu,bubble,40,20
-Keromatsu,freeze shock,46,70
-Fukamaru,tackle,30,0
-Fukamaru,scratch,34,20
-Fukamaru,earthquake,46,70
-Fushigidane,tackle,30,0
-Fushigidane,vine whip,40,20
-Fushigidane,razor leaf,46,70
+Hitokage,tackle,20,0
+Hitokage,scratch,30,10
+Hitokage,flamethrower,40,80
+Keromatsu,tackle,20,0
+Keromatsu,bubble,30,20
+Keromatsu,freeze shock,40,80
+Fukamaru,tackle,20,0
+Fukamaru,scratch,30,20
+Fukamaru,earthquake,40,80
+Fushigidane,tackle,20,0
+Fushigidane,vine whip,30,20
+Fushigidane,razor leaf,40,80

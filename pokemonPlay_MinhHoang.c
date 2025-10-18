@@ -444,6 +444,16 @@ int calculateDamage(short typeSkill, char *namePokemon)
     //
     playerEngraved = checkDefenseEngraved();
     //
+
+    for (int i = 0; i < numberOfSkill; i += 3)
+    {
+        if (typeSkill - 1 == i)
+        {
+            damage = skill[typeSkill - 1].dmg - pokemon[getNumberOfPokemon(namePokemon) - 1].defense;
+            return damage;
+        }
+    }
+
     if (playerEngraved == 1)
     {
         damage = skill[typeSkill - 1].dmg * 1.5 - pokemon[getNumberOfPokemon(namePokemon) - 1].defense;
@@ -724,6 +734,4 @@ int main()
 }
 // D:\c++\c\deadline\pokemonBattle_MinhHoang\pokemonPlay_MinhHoang.exe
 
-// sua con chieu 1 la he thuong
-// sua dmg, mp trong file chieuPokemon.txt
 // them di chuyen con tro trong terminal như trong test.c
