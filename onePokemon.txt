@@ -1,0 +1,4 @@
+Hitokage,f,1,100,100,52,8
+Keromatsu,w,1,100,100,37,8
+Fushigidane,l,1,100,100,49,8
+Fukamaru,e,1,100,100,58,8
