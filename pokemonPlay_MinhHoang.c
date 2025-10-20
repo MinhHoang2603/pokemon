@@ -78,6 +78,7 @@ int calculateDamage(short skill, char *namePokemon);
 int choosePokemon();
 int createOrJoinGame();
 
+#define LIGHTBLUE "\x1b[94m"
 #define BLUE "\x1b[34m"
 #define BOLD "\x1b[1m"
 #define RESET "\x1b[0m"
@@ -86,6 +87,7 @@ int createOrJoinGame();
 #define GREEN "\x1b[32m"
 #define ORANGE "\x1b[38;5;208m"
 #define BROWN "\x1b[38;5;94m"
+#define GRAY "\x1b[90m"
 
 void printFront()
 {
@@ -479,7 +481,7 @@ void printContent()
     sleep(1);
 }
 
-void GetStructPokemon()
+void getStructPokemon()
 {
     FILE *fptr;
     fptr = fopen("onePokemon.txt", "r");
@@ -498,7 +500,7 @@ void GetStructPokemon()
     fclose(fptr);
 }
 
-void GetStructSkill()
+void getStructSkill()
 {
     FILE *fptr;
     fptr = fopen("chieuPokemon.txt", "r");
@@ -539,7 +541,7 @@ void printPokemonStatus()
         printf(RESET);
         break;
     case 'w':
-        printf(BLUE "\t\t\t\t%s", opponent_choice);
+        printf(LIGHTBLUE "\t\t\t\t%s", opponent_choice);
         printf(RESET);
         break;
     case 'l':
@@ -574,7 +576,7 @@ void printPokemonStatus()
         printf(RESET);
         break;
     case 'w':
-        printf(BLUE "%s", player_choice);
+        printf(LIGHTBLUE "%s", player_choice);
         printf(RESET);
         break;
     case 'l':
@@ -630,10 +632,21 @@ void printSkillOfPokemon()
     {
         if (strcmp(player_choice, skill[i].pokemon) == 0)
         {
-            printf("%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
-            j++;
-            endSkill = i;
-            countSkillOfPokemon++;
+            if (skill[i].mp > pokemon[getNumberOfPokemon(player_choice) - 1].mana)
+            {
+                printf(GRAY "%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
+                printf(RESET);
+                j++;
+                endSkill = i;
+                countSkillOfPokemon++;
+            }
+            else
+            {
+                printf("%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
+                j++;
+                endSkill = i;
+                countSkillOfPokemon++;
+            }
         }
     }
 }
@@ -703,8 +716,8 @@ int choosePokemon()
 
 int main()
 {
-    GetStructPokemon(); //
-    GetStructSkill();   //
+    getStructPokemon(); //
+    getStructSkill();   //
     createOrJoinGame(); //
 
     while (pokemon[getNumberOfPokemon(opponent_choice) - 1].health > 0 && pokemon[getNumberOfPokemon(player_choice) - 1].health > 0)

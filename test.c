@@ -29,7 +29,7 @@ void highlight(int x, int y, const char *text)
 
 void print_choice(int player)
 {
-    gotoxy(10, 12);
+    gotoxy(0, 0);
     printf("Ban da chon: %s", choices[player]);
 }
 
@@ -39,7 +39,7 @@ int main()
     int key;
 
     system("cls");
-    gotoxy(10, 3);
+    gotoxy(10, 0);
     printf("=== Chon Kéo - Búa - Bao ===");
 
     while (1)
@@ -80,13 +80,13 @@ int main()
     system("cls");
     if (choice == 3)
     {
-        gotoxy(10, 10);
+        gotoxy(0, 0);
         printf("Ban da chon Thoat. Ket thuc chuong trinh.");
     }
     else
     {
         print_choice(choice);
-        gotoxy(10, 14);
+        gotoxy(0, 1);
         printf("Cam on ban da tham gia!");
     }
 

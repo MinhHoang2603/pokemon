@@ -1,1 +1,0 @@
-.\pokemonPlay_MinhHoang.exe
