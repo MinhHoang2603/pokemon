@@ -138,7 +138,8 @@ int giveSkill()
             return 1;
         }
 
-        printf("\nBan da gay ra %hi sat thuong len doi thu.\n", myDamage);
+        printf(ORANGE "\nBan gay ra %hi dmg.\n", myDamage);
+        printf(RESET);
         sleep(1);
         if (pokemon[getNumberOfPokemon(opponent_choice) - 1].health <= 0)
         {
@@ -159,7 +160,8 @@ int giveSkill()
         opponentDamage = opponentMsg.dmg;
         subtractMyHealth(opponentDamage);
 
-        printf("\nDoi thu da gay ra %hi sat thuong len ban.\n", opponentDamage);
+        printf(ORANGE "\nDoi thu gay ra %hi dmg.\n", opponentDamage);
+        printf(RESET);
         if (pokemon[getNumberOfPokemon(player_choice) - 1].health <= 0)
         {
             return 0;
@@ -202,7 +204,8 @@ int giveSkill()
         printFront();
         printPokemonStatus();
 
-        printf("\nDoi thu da gay ra %hi sat thuong len ban.\n", opponentDamage);
+        printf(ORANGE "\nDoi thu gay ra %hi dmg.\n", opponentDamage);
+        printf(RESET);
         sleep(1);
         if (pokemon[getNumberOfPokemon(player_choice) - 1].health <= 0)
         {
@@ -226,7 +229,8 @@ int giveSkill()
             return 1;
         }
 
-        printf("\nBan da gay ra %hi sat thuong len doi thu.\n", myDamage);
+        printf(ORANGE "\nBan gay ra %hi dmg.\n", myDamage);
+        printf(RESET);
         sleep(1);
         if (pokemon[getNumberOfPokemon(opponent_choice) - 1].health <= 0)
         {
@@ -353,7 +357,28 @@ int createOrJoinGame()
             return 1;
         }
     }
+    ////////////////////
+    if (strcmp(player_choice, opponent_choice) == 0)
+    {
+        int originalId = getNumberOfPokemon(player_choice) - 1;
 
+        char newName[100];
+        snprintf(newName, sizeof(newName), "%s_2", pokemon[originalId].name);
+
+        if (numberOfPokemon < 100)
+        {
+            pokemon[numberOfPokemon] = pokemon[originalId];
+            strcpy(pokemon[numberOfPokemon].name, newName);
+            pokemon[numberOfPokemon].name[sizeof(pokemon[numberOfPokemon].name) - 1] = '\0';
+            strcpy(opponent_choice, pokemon[numberOfPokemon].name);
+            numberOfPokemon++;
+        }
+        else
+        {
+            strncat(opponent_choice, "_2", sizeof(opponent_choice) - strlen(opponent_choice) - 1);
+        }
+    }
+    ////////////////////
     printf("\n");
     printf(RED "\t\t\t   TRAN CHIEN BAT DAU!\n");
     printf(RESET);
@@ -727,7 +752,7 @@ int main()
         if (pokemon[getNumberOfPokemon(opponent_choice) - 1].health <= 0)
         {
             system("cls");
-            printf(RED "\n\t\t\t   BAN DA THANG!\n");
+            printf(GREEN "\n\t\t\t   BAN DA THANG!\n");
             printf(RESET);
             break;
         }
@@ -745,6 +770,6 @@ int main()
     CloseHandle(hPipe);
     return 0;
 }
-// D:\c++\c\deadline\pokemonBattle_MinhHoang\pokemonPlay_MinhHoang.exe
+// D:\c++\c\deadline\pokemon_MinhHoang\pokemonPlay_MinhHoang.exe
 
 // them di chuyen con tro trong terminal như trong test.c
