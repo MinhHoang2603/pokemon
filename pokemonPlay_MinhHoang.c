@@ -498,6 +498,25 @@ int calculateDamage(short typeSkill, char *namePokemon)
 }
 // end
 
+void printPokemonColor(char *namePokemon)
+{
+    switch (pokemon[getNumberOfPokemon(namePokemon) - 1].type)
+    {
+    case 'f':
+        printf(ORANGE);
+        break;
+    case 'w':
+        printf(LIGHTBLUE);
+        break;
+    case 'l':
+        printf(GREEN);
+        break;
+    case 'e':
+        printf(BROWN);
+        break;
+    }
+}
+
 void printContent()
 {
     printf("\nBan chi co the chon 1 pokemon trong tui de chien dau \n");
@@ -559,25 +578,9 @@ void printPokemonStatus()
     printf(ORANGE "\t\t\t   BATTLE\n");
     printf(RESET);
     printf("===========================Turn %hi===========================\n\n", turn);
-    switch (pokemon[getNumberOfPokemon(opponent_choice) - 1].type)
-    {
-    case 'f':
-        printf(ORANGE "\t\t\t\t%s", opponent_choice);
-        printf(RESET);
-        break;
-    case 'w':
-        printf(LIGHTBLUE "\t\t\t\t%s", opponent_choice);
-        printf(RESET);
-        break;
-    case 'l':
-        printf(GREEN "\t\t\t\t%s", opponent_choice);
-        printf(RESET);
-        break;
-    case 'e':
-        printf(BROWN "\t\t\t\t%s", opponent_choice);
-        printf(RESET);
-        break;
-    }
+    printPokemonColor(opponent_choice);
+    printf("\t\t\t\t%s", opponent_choice);
+    printf(RESET);
 
     printf("\n\t\t\t\tHP: \t");
     stayHP = pokemon[getNumberOfPokemon(opponent_choice) - 1].health / 5;
@@ -594,25 +597,9 @@ void printPokemonStatus()
     }
 
     printf("\n\n");
-    switch (pokemon[getNumberOfPokemon(player_choice) - 1].type)
-    {
-    case 'f':
-        printf(ORANGE "%s", player_choice);
-        printf(RESET);
-        break;
-    case 'w':
-        printf(LIGHTBLUE "%s", player_choice);
-        printf(RESET);
-        break;
-    case 'l':
-        printf(GREEN "%s", player_choice);
-        printf(RESET);
-        break;
-    case 'e':
-        printf(BROWN "%s", player_choice);
-        printf(RESET);
-        break;
-    }
+    printPokemonColor(player_choice);
+    printf("%s", player_choice);
+    printf(RESET);
     printf("\nHP: \t");
     stayHP = pokemon[getNumberOfPokemon(player_choice) - 1].health / 5;
     subtractHP = 20 - stayHP;
@@ -646,7 +633,7 @@ void printPokemonStatus()
 // Function to choose skill
 void printSkillOfPokemon()
 {
-    short i = 0, j = 1;
+    short i = 0, j = 1, check = 0;
     countSkillOfPokemon = 0;
     endSkill = 0;
 
@@ -667,11 +654,24 @@ void printSkillOfPokemon()
             }
             else
             {
-                printf("%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
+                if (i == check)
+                {
+                    printf("%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
+                }
+                else
+                {
+                    printPokemonColor(player_choice);
+                    printf("%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
+                    printf(RESET);
+                }
                 j++;
                 endSkill = i;
                 countSkillOfPokemon++;
             }
+        }
+        if (i == check)
+        {
+            check += 3;
         }
     }
 }
