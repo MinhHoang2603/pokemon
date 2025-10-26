@@ -31,15 +31,16 @@ struct Battle
     char skill[100];
     int mana;
 };
-//
+
 struct message
 {
     short turn;
     int dmg;
 };
+
 struct message playerMsg;
 struct message opponentMsg;
-//
+
 struct Pokemon pokemon[100];
 struct turnSkill skill[100];
 
@@ -60,23 +61,62 @@ short countSkillOfPokemon = 0;
 HANDLE hPipe;
 DWORD bytesRead, bytesWritten;
 
+// hàm in logo
+void printFront();
+//
+
+// hàm lấy dữ liệu từ file
 void GetStructPokemon();
 void GetStructSkill();
+//
+
+// hàm in dữ liệu về pokemon
 void printPokemonInPack();
 void printPokemonStatus();
 void printSkillOfPokemon();
+//
+
+// hàm in văn bản
 void printContent();
-void subtractMana(int mana, char *namePokemon);
+//
+
+// hàm lấy lựa chọn người chơi
 int getChooseSkill();
 void chooseSkill();
+int choosePokemon();
+//
+
+// hàm nhận hệ pokemon
 char getPokemonType(char *namePokemon);
+//
+
+// hàm lấy thứ tự pokemon
 int getNumberOfPokemon(char *namePokemon);
+//
+
+// hàm xác định tương khắc hệ
 short checkDefenseEngraved();
+//
+
+// hàm trừ thông tin
+void subtractMana(int mana, char *namePokemon);
 void subtractMyHealth(int damage);
 void subtractOpponentHealth(int damage);
+//
+
+// hàm tính sát thương
 int calculateDamage(short skill, char *namePokemon);
-int choosePokemon();
+//
+
+// hàm chạy 2 người chơi và lấy lựa chọn 2 bên
+char *inputPipeName();
 int createOrJoinGame();
+int giveSkill();
+//
+
+// in màu cho pokemon
+void printPokemonColor(char *namePokemon);
+//
 
 #define LIGHTBLUE "\x1b[94m"
 #define BLUE "\x1b[34m"
@@ -105,12 +145,12 @@ void printFront()
 
 char *inputPipeName()
 {
-    // input match code
+    // người chơi nhập mã trận đấu
     printf("input match code: ");
     fgets(match_code, 20, stdin);
     match_code[strcspn(match_code, "\n")] = 0;
 
-    // create pipe name based on match code
+    // tạo tên pipe từ mã trận đấu
     snprintf(pipe_name, 50, "\\\\.\\pipe\\match_%s", match_code);
 }
 
@@ -249,9 +289,10 @@ int createOrJoinGame()
 {
     int choose = 0, again = 0;
 
-    // choose role
-    printf("Chon: 1 (create game) \nChon: 2 (join game) \n");
-    printf("chon: ");
+    // chọn vai trò
+    printf("Chon: 1 (tao game) \nChon: 2 (Tham gia game) \n");
+    printf("Chon: ");
+    // kiểm tra dữ liệu nhận vào
     while (scanf("%hi", &role) != 1 || (role != 1 && role != 2))
     {
         getchar();
@@ -261,7 +302,7 @@ int createOrJoinGame()
 
     if (role == 1)
     {
-        // Player 1: create pipe
+        // người chơi 1: tạo pipe
         printf("\n");
         inputPipeName();
         hPipe = CreateNamedPipe(pipe_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, 1, 100, 100, 0, NULL);
@@ -272,7 +313,7 @@ int createOrJoinGame()
         }
 
         printf("Player 1 san sang, doi Player 2...\n");
-        // wait for Player 2 to connect
+        // đợi người chơi 2 kết nối
         if (!ConnectNamedPipe(hPipe, NULL))
         {
             printf("Ket noi pipe that bai: %ld\n", GetLastError());
@@ -282,7 +323,7 @@ int createOrJoinGame()
     }
     else
     {
-        // Player 2: connect to pipe
+        // người chơi 2: kết nối tới pipe
         do
         {
             printf("\n");
@@ -304,7 +345,7 @@ int createOrJoinGame()
 
     if (role == 1)
     {
-        // input pokemon choice
+        // người chơi 1: chọn pokemon trước
         printFront();
         printf("\n");
         printContent();
@@ -312,6 +353,7 @@ int createOrJoinGame()
         strcpy(player_choice, pokemon[choose - 1].name);
         player_choice[strcspn(player_choice, "\n")] = 0;
 
+        // gửi dữ liệu pokemon được lựa chọn từ người chơi 1
         if (!WriteFile(hPipe, player_choice, strlen(player_choice) + 1, &bytesWritten, NULL))
         {
             printf("Gui du lieu that bai: %ld\n", GetLastError());
@@ -320,7 +362,7 @@ int createOrJoinGame()
         }
         printf("\ndoi ke dich chon pokemon...\n");
 
-        // give opponent choice
+        // nhận dữ liệu pokemon được lựa chọn từ người chơi 2
         if (!ReadFile(hPipe, opponent_choice, 50, &bytesRead, NULL))
         {
             printf("Nhan du lieu that bai: %ld\n", GetLastError());
@@ -332,7 +374,7 @@ int createOrJoinGame()
     {
         printFront();
         printf("\ndoi ke dich chon pokemon...\n");
-        // give opponent choice
+        // nhận dữ liệu pokemon được lựa chọn từ người chơi 1
         if (!ReadFile(hPipe, opponent_choice, 50, &bytesRead, NULL))
         {
             printf("Nhan du lieu that bai: %ld\n", GetLastError());
@@ -345,11 +387,12 @@ int createOrJoinGame()
         printf("\n");
         printContent();
 
-        // input pokemon choice
+        // người chơi 2: chọn pokemon sau
         choose = choosePokemon();
         strcpy(player_choice, pokemon[choose - 1].name);
         player_choice[strcspn(player_choice, "\n")] = 0;
 
+        // gửi dữ liệu pokemon được lựa chọn từ người chơi 2
         if (!WriteFile(hPipe, player_choice, strlen(player_choice) + 1, &bytesWritten, NULL))
         {
             printf("Gui du lieu that bai: %ld\n", GetLastError());
@@ -357,14 +400,17 @@ int createOrJoinGame()
             return 1;
         }
     }
-    ////////////////////
+
+    // xử lí trường hợp 2 người chơi chọn cùng 1 pokemon
     if (strcmp(player_choice, opponent_choice) == 0)
     {
         int originalId = getNumberOfPokemon(player_choice) - 1;
 
+        // tạo tên mới cho pokemon đối thủ
         char newName[100];
         snprintf(newName, sizeof(newName), "%s_2", pokemon[originalId].name);
 
+        // thêm pokemon mới vào danh sách nếu chưa đầy 100 pokemon
         if (numberOfPokemon < 100)
         {
             pokemon[numberOfPokemon] = pokemon[originalId];
@@ -373,12 +419,14 @@ int createOrJoinGame()
             strcpy(opponent_choice, pokemon[numberOfPokemon].name);
             numberOfPokemon++;
         }
+
+        // nếu đã đầy 100 pokemon, chỉ cần đổi tên
         else
         {
             strncat(opponent_choice, "_2", sizeof(opponent_choice) - strlen(opponent_choice) - 1);
         }
     }
-    ////////////////////
+
     printf("\n");
     printf(RED "\t\t\t   TRAN CHIEN BAT DAU!\n");
     printf(RESET);
@@ -387,18 +435,18 @@ int createOrJoinGame()
 
     return 1;
 }
-// end
 
-// Function to calculate damage
-// defenseEngraved: 1 -> increase attack
-// defenseEngraved: 0 -> normal attack
-// defenseEngraved: -1 -> decrease attack
+// số được dùng để xác định tương khắc hệ
+// defenseEngraved: 1 -> tăng cường tấn công
+// defenseEngraved: 0 -> tấn công bình thường
+// defenseEngraved: -1 -> giảm tấn công
 
 char getPokemonType(char *namePokemon)
 {
     int i = 0;
     for (; i < numberOfPokemon; i++)
     {
+        // tìm hệ pokemon theo tên
         if (strcmp(namePokemon, pokemon[i].name) == 0)
         {
             break;
@@ -413,6 +461,7 @@ int getNumberOfPokemon(char *namePokemon)
     int i = 0;
     for (; i < numberOfPokemon; i++)
     {
+        // tìm thứ tự pokemon theo tên
         if (strcmp(namePokemon, pokemon[i].name) == 0)
         {
             break;
@@ -421,8 +470,6 @@ int getNumberOfPokemon(char *namePokemon)
 
     return i + 1;
 }
-
-// function to calculate damage
 
 void subtractMana(int mana, char *namePokemon)
 {
@@ -444,34 +491,37 @@ short checkDefenseEngraved()
     char playerType = getPokemonType(player_choice);
     char opponentType = getPokemonType(opponent_choice);
 
+    // xác định điều kiện tăng sức tấn công
     if ((playerType == 'f' && opponentType == 'l') ||
         (playerType == 'w' && opponentType == 'f') ||
         (playerType == 'l' && opponentType == 'e') ||
         (playerType == 'e' && opponentType == 'w'))
     {
-        return 1; // increate attack
+        return 1;
     }
+    // xác định điều kiện giảm sức tấn công
     else if ((playerType == 'f' && opponentType == 'w') ||
              (playerType == 'w' && opponentType == 'e') ||
              (playerType == 'l' && opponentType == 'f') ||
              (playerType == 'e' && opponentType == 'l'))
     {
-        return -1; // decrease attack
+        return -1;
     }
+    // điều kiện tấn công bình thường
     else
     {
-        return 0; // normal attack
+        return 0;
     }
 }
-// sai khi role 2 nhan dame vao
+
 int calculateDamage(short typeSkill, char *namePokemon)
 {
     int damage = 0;
     short playerEngraved = 0;
-    //
+    // xác định trạng thái tăng cường
     playerEngraved = checkDefenseEngraved();
-    //
 
+    // giữ chiêu đầu tiên không bị ảnh hưởng bởi tương khắc hệ
     for (int i = 0; i < numberOfSkill; i += 3)
     {
         if (typeSkill - 1 == i)
@@ -481,14 +531,17 @@ int calculateDamage(short typeSkill, char *namePokemon)
         }
     }
 
+    // tính sát thương sau khi tăng
     if (playerEngraved == 1)
     {
         damage = skill[typeSkill - 1].dmg * 1.5 - pokemon[getNumberOfPokemon(namePokemon) - 1].defense;
     }
+    // tính sát thương bình thường
     else if (playerEngraved == 0)
     {
         damage = skill[typeSkill - 1].dmg - pokemon[getNumberOfPokemon(namePokemon) - 1].defense;
     }
+    // tính sát thương sau khi giảm
     else if (playerEngraved == -1)
     {
         damage = skill[typeSkill - 1].dmg * 0.5 - pokemon[getNumberOfPokemon(namePokemon) - 1].defense;
@@ -496,10 +549,10 @@ int calculateDamage(short typeSkill, char *namePokemon)
 
     return damage;
 }
-// end
 
 void printPokemonColor(char *namePokemon)
 {
+    // in màu theo hệ pokemon
     switch (pokemon[getNumberOfPokemon(namePokemon) - 1].type)
     {
     case 'f':
@@ -527,6 +580,7 @@ void printContent()
 
 void getStructPokemon()
 {
+    // đọc dữ liệu từ file để lấy pokemon trong kho
     FILE *fptr;
     fptr = fopen("onePokemon.txt", "r");
 
@@ -546,6 +600,7 @@ void getStructPokemon()
 
 void getStructSkill()
 {
+    // đọc dữ liệu từ file để lấy chiêu thức của pokemon
     FILE *fptr;
     fptr = fopen("chieuPokemon.txt", "r");
 
@@ -573,11 +628,14 @@ void printPokemonInPack()
 
 void printPokemonStatus()
 {
+    // in màn hình trạng thái pokemon
     int stayHP = 0, stayMP = 0;
     int subtractHP = 0, subtractMP = 0;
     printf(ORANGE "\t\t\t   BATTLE\n");
     printf(RESET);
     printf("===========================Turn %hi===========================\n\n", turn);
+
+    // in trạng thái pokemon đối thủ
     printPokemonColor(opponent_choice);
     printf("\t\t\t\t%s", opponent_choice);
     printf(RESET);
@@ -596,6 +654,7 @@ void printPokemonStatus()
         printf(RESET);
     }
 
+    // in trạng thái pokemon người chơi
     printf("\n\n");
     printPokemonColor(player_choice);
     printf("%s", player_choice);
@@ -630,7 +689,6 @@ void printPokemonStatus()
     printf("\n");
 }
 
-// Function to choose skill
 void printSkillOfPokemon()
 {
     short i = 0, j = 1, check = 0;
@@ -638,12 +696,13 @@ void printSkillOfPokemon()
     endSkill = 0;
 
     printf("\n");
-    printf(YELLOW "skill of %s: \n", player_choice);
+    printf(YELLOW "ki nang của %s: \n", player_choice);
     printf(RESET);
     for (i = 0; i < numberOfSkill; i++)
     {
         if (strcmp(player_choice, skill[i].pokemon) == 0)
         {
+            // in skill có mana không đủ
             if (skill[i].mp > pokemon[getNumberOfPokemon(player_choice) - 1].mana)
             {
                 printf(GRAY "%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
@@ -652,12 +711,15 @@ void printSkillOfPokemon()
                 endSkill = i;
                 countSkillOfPokemon++;
             }
+            // in skill có mana đủ
             else
             {
+                // in skill đầu tiên không có hệ
                 if (i == check)
                 {
                     printf("%d. %s (dmg: %d, mp: %d)\n", j, skill[i].nameSkill, skill[i].dmg, skill[i].mp);
                 }
+                // in skill có hệ
                 else
                 {
                     printPokemonColor(player_choice);
@@ -682,6 +744,7 @@ int getChooseSkill()
     short count = 0;
 
     printSkillOfPokemon();
+    // xử lí lựa chọn skill
     do
     {
         if (count == 0)
@@ -702,6 +765,7 @@ int getChooseSkill()
         count++;
     } while (pokemon[getNumberOfPokemon(player_choice) - 1].mana < skill[choose - 1].mp);
 
+    // trừ mana sau khi chọn skill
     subtractMana(skill[choose - 1].mp, player_choice);
 
     return choose;
@@ -711,6 +775,7 @@ void chooseSkill()
 {
     short i = 0;
 
+    // chọn skill và in kĩ năng đã chọn
     playerSkill = getChooseSkill();
     system("cls");
     printFront();
@@ -718,14 +783,13 @@ void chooseSkill()
     printf("\n");
     printf("%s - %s\n", player_choice, skill[playerSkill - 1].nameSkill);
 }
-// end
 
 int choosePokemon()
 {
     int choose = 0;
 
     printf("\n");
-    printf(YELLOW "pokemon in pack: \n");
+    printf(YELLOW "pokemon trong túi: \n");
     printf(RESET);
     printPokemonInPack();
 
@@ -745,10 +809,12 @@ int main()
     getStructSkill();   //
     createOrJoinGame(); //
 
+    // chạy đến khi một trong hai pokemon hết máu
     while (pokemon[getNumberOfPokemon(opponent_choice) - 1].health > 0 && pokemon[getNumberOfPokemon(player_choice) - 1].health > 0)
     {
         giveSkill();
 
+        // kiểm tra xem bản thân thắng không
         if (pokemon[getNumberOfPokemon(opponent_choice) - 1].health <= 0)
         {
             system("cls");
@@ -756,6 +822,8 @@ int main()
             printf(RESET);
             break;
         }
+
+        // kiểm tra xem bản thân thua không
         else if (pokemon[getNumberOfPokemon(player_choice) - 1].health <= 0)
         {
             system("cls");
